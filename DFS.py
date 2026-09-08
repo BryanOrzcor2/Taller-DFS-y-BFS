@@ -152,20 +152,16 @@ def buscar_conexion_dfs(
         if profundidad >= limite_profundidad:
             continue
 
-        # 6. Generar e insertar vecinos en la pila LIFO
-        #    Se insertan en orden INVERSO al del diccionario para que el
-        #    primer vecino listado sea el primero en salir de la cima.
-        for vecino in reversed(red[actual]):
+        # Completar la generacion e insercion de vecinos en la pila LIFO
+        for vecino in red[actual]:
             if vecino not in visitados:
-                # Registrar padre solo la primera vez que se descubre
-                if vecino not in padres:
-                    padres[vecino] = actual
+                padres[vecino] = actual
                 frontera.append((vecino, profundidad + 1))
                 nodos_generados += 1
 
-                # Actualizar tamano maximo de la frontera
-                if len(frontera) > frontera_maxima:
-                    frontera_maxima = len(frontera)
+        # Actualizar tamano maximo que alcanzo la pila
+        if len(frontera) > frontera_maxima:
+            frontera_maxima = len(frontera)
 
     # -- Sin camino -----------------------------------------------------------
     return {
