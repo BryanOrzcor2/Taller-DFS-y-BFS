@@ -1,10 +1,11 @@
 """
-main.py  -  Taller 2: Ejecución Consolidada (Puntos 7, 9 y 10)
-============================================================
-Ejecuta de forma secuencial y limpia:
+main.py  -  Taller 2: Ejecución Consolidada (Puntos 7, 8, 9, 10 y 11)
+===================================================================
+Ejecuta de forma secuencial y completa todos los puntos del taller:
   - Punto 7 & 8: Las 6 pruebas comparativas BFS vs DFS en la red base.
   - Punto 9: Prueba de usuarios sin conexión (Laura y Mateo).
   - Punto 10: Pruebas sobre la red modificada (16 usuarios, 5 nuevos y 8 conexiones).
+  - Punto 11: Mejora del sistema (Benchmark de tiempos de CPU y generación de gráficas).
 
 Docente   : Joaquín F. Sánchez
 Asignatura: Inteligencia Artificial - Maestría en IA - Sergio Arboleda 2026
@@ -16,6 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from red_social import red_social, red_social_modificada
 from BFS import buscar_conexion_bfs
 from DFS import buscar_conexion_dfs
+from punto11 import benchmark_algoritmos
 
 
 def ejecutar_punto_7():
@@ -135,10 +137,19 @@ def ejecutar_punto_10():
     print("=" * 82)
 
 
+def ejecutar_punto_11():
+    print("\n" + "=" * 82)
+    print("  PUNTO 11 - Mejora del Sistema: Medición y Gráficas de Tiempos (BFS vs DFS)")
+    print("=" * 82)
+    benchmark_algoritmos()
+
+
 if __name__ == "__main__":
     ejecutar_punto_7()
     ejecutar_punto_8()
     ejecutar_punto_9()
     ejecutar_punto_10()
+    ejecutar_punto_11()
+
 
 
