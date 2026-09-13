@@ -53,6 +53,31 @@ def ejecutar_punto_7():
     print("=" * 82)
 
 
+def ejecutar_punto_8():
+    print("\n" + "=" * 82)
+    print("  PUNTO 8 - Conclusiones del Analisis Comparativo BFS vs DFS")
+    print("=" * 82)
+    print("""
+  1. Misma ruta? No siempre (solo en P1 y P5 por coincidencia favorable).
+  2. Menor grados sep.? BFS siempre garantiza la ruta con menor o igual saltos.
+  3. Menos expansiones? DFS expandio menos en promedio (6.16 vs 9.33), pero con
+     alta variabilidad segun la rama elegida.
+  4. Frontera mas grande? DFS alcanzo FMax de hasta 6 nodos (vs 4 de BFS).
+  5. Orden de vecinos? En DFS es critico (la cima de la pila define la rama);
+     en BFS solo define desempates en el mismo nivel.
+  6. Sin conjunto visitados? Bucle infinito en DFS y desbordamiento RAM en BFS
+     por ciclos triviales de longitud 2 (grafo no dirigido).
+  7. Por que BFS garantiza la ruta mas corta? Monotonicidad de la cola FIFO:
+     extrae nodos en orden no decreciente de profundidad (g(n)).
+  8. DFS puede hallar primero una ruta mas larga? Si (ej. P3: 10 vs 3 grados).
+  9. Limite de profundidad? Si limite < d*, pierde completitud; si limite >> d*,
+     permite ramas innecesariamente largas.
+  10. Algoritmo recomendado? BFS indiscutiblemente, ya que los grados de
+      separacion se definen como la distancia geodesica minima (d_G(u, v)).
+    """)
+    print("=" * 82)
+
+
 def ejecutar_punto_9():
     print("\n" + "=" * 82)
     print("  PUNTO 9 - Usuarios sin conexion (Componente desconectado)")
@@ -96,7 +121,7 @@ def ejecutar_punto_10():
 
         for alg_nombre, r in [("BFS", res_bfs), ("DFS", res_dfs)]:
             if r["encontrado"]:
-                ruta_str = " -> ".join(r["ruta"])
+                ruta_str = " -> ".join(r["ruta"]).replace("Néstor", "Nestor")
                 g   = r["grados_separacion"]
                 exp = r["nodos_expandidos"]
                 gen = r["nodos_generados"]
@@ -112,6 +137,8 @@ def ejecutar_punto_10():
 
 if __name__ == "__main__":
     ejecutar_punto_7()
+    ejecutar_punto_8()
     ejecutar_punto_9()
     ejecutar_punto_10()
+
 

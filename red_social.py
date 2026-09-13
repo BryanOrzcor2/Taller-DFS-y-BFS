@@ -47,3 +47,9 @@ red_social_modificada = {
     "Pedro":   ["Marta"],
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Red social con componente desconectado (Punto 9: Laura y Mateo)
+# ─────────────────────────────────────────────────────────────────────────────
+red_social_desconectada = {k: list(v) for k, v in red_social.items()}
+red_social_desconectada["Laura"] = ["Mateo"]
+red_social_desconectada["Mateo"] = ["Laura"]
