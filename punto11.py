@@ -1,8 +1,9 @@
 """
-punto11.py  -  Punto 11: Mejora del Sistema (Medición y Gráficas de Tiempo de Ejecución)
-========================================================================================
+punto11.py  -  Punto 11: Mejora del Sistema (Medición y Gráficas de Líneas)
+===========================================================================
 Mide con alta precisión (time.perf_counter_ns) los tiempos de ejecución de BFS y DFS,
-genera gráficas individuales para cada algoritmo y una gráfica unificada comparativa final.
+genera gráficas en formato de líneas con marcadores para cada algoritmo y una
+gráfica comparativa unificada final en líneas.
 
 Docente   : Joaquín F. Sánchez
 Asignatura: Inteligencia Artificial - Maestría en IA - Sergio Arboleda 2026
@@ -30,23 +31,24 @@ PRUEBAS = [
     (6, "Helena",  "Ana"),
 ]
 
-NUM_REPETICIONES = 1000  # Repeticiones para significancia estadística
+NUM_REPETICIONES = 1000
 
 def benchmark_algoritmos():
     etiquetas = [f"P{num}\n({orig}→{dest})" for num, orig, dest in PRUEBAS]
+    x_indices = list(range(len(PRUEBAS)))
     tiempos_bfs_us = []
     tiempos_dfs_us = []
     desv_bfs_us = []
     desv_dfs_us = []
 
     print("\n" + "=" * 86)
-    print(f"  PUNTO 11 - Benchmark de Tiempo de Ejecución (N = {NUM_REPETICIONES} iteraciones por par)")
+    print(f"  PUNTO 11 - Benchmark de Tiempo de Ejecución (Líneas / N = {NUM_REPETICIONES})")
     print("=" * 86)
     print(f"  {'Prueba':<20} | {'BFS Prom (µs)':<15} {'BFS Std':<10} | {'DFS Prom (µs)':<15} {'DFS Std':<10} | {'Diferencia':<10}")
     print("-" * 86)
 
     for num, orig, dest in PRUEBAS:
-        # Warmup inicial
+        # Calentamiento inicial
         buscar_conexion_bfs(red_social, orig, dest)
         buscar_conexion_dfs(red_social, orig, dest)
 
@@ -56,7 +58,7 @@ def benchmark_algoritmos():
             inicio = time.perf_counter_ns()
             buscar_conexion_bfs(red_social, orig, dest)
             fin = time.perf_counter_ns()
-            t_bfs.append((fin - inicio) / 1000.0)  # microsegundos
+            t_bfs.append((fin - inicio) / 1000.0)
 
         # Muestreo DFS
         t_dfs = []
@@ -64,7 +66,7 @@ def benchmark_algoritmos():
             inicio = time.perf_counter_ns()
             buscar_conexion_dfs(red_social, orig, dest)
             fin = time.perf_counter_ns()
-            t_dfs.append((fin - inicio) / 1000.0)  # microsegundos
+            t_dfs.append((fin - inicio) / 1000.0)
 
         prom_bfs = statistics.mean(t_bfs)
         std_bfs = statistics.stdev(t_bfs)
@@ -82,91 +84,99 @@ def benchmark_algoritmos():
 
     print("=" * 86)
 
+    # Configuración de estilo global
+    plt.rcParams['font.sans-serif'] = 'Arial'
+    plt.rcParams['axes.edgecolor'] = '#94a3b8'
+    plt.rcParams['axes.linewidth'] = 0.9
+
     # ─────────────────────────────────────────────────────────────────────────
-    # 1. Gráfica Individual BFS
+    # 1. Gráfica Individual de Línea - BFS
     # ─────────────────────────────────────────────────────────────────────────
-    plt.figure(figsize=(9, 5))
-    barras_bfs = plt.bar(etiquetas, tiempos_bfs_us, color='#2563eb', edgecolor='#1d4ed8', width=0.55, alpha=0.9)
-    plt.title('Tiempo de Ejecución - BFS (Breadth-First Search)', fontsize=13, fontweight='bold', pad=15)
-    plt.xlabel('Casos de Prueba (Pares de Usuarios)', fontsize=11, fontweight='bold')
-    plt.ylabel('Tiempo Promedio (Microsegundos - µs)', fontsize=11, fontweight='bold')
-    plt.grid(axis='y', linestyle='--', alpha=0.6)
-    
-    # Anotar valores en las barras
-    for bar in barras_bfs:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2.0, yval + (max(tiempos_bfs_us)*0.02), f'{yval:.1f} µs',
-                 ha='center', va='bottom', fontsize=9, fontweight='bold', color='#1e3a8a')
+    plt.figure(figsize=(8.5, 4.8))
+    plt.plot(x_indices, tiempos_bfs_us, color='#2563eb', linewidth=2.8,
+             marker='o', markersize=8, markerfacecolor='#1d4ed8', markeredgecolor='white', markeredgewidth=1.8,
+             label='BFS (Cola FIFO)')
+    plt.fill_between(x_indices, tiempos_bfs_us, color='#3b82f6', alpha=0.15)
+    plt.title('Perfil Temporal - BFS (Breadth-First Search)', fontsize=12, fontweight='bold', pad=12)
+    plt.xlabel('Casos de Prueba (Pares de Usuarios)', fontsize=10, fontweight='bold')
+    plt.ylabel('Tiempo Promedio (µs)', fontsize=10, fontweight='bold')
+    plt.xticks(x_indices, etiquetas, fontsize=9)
+    plt.ylim(0, max(tiempos_bfs_us) * 1.25)
+    plt.grid(True, linestyle='--', alpha=0.5)
+
+    for i, txt in enumerate(tiempos_bfs_us):
+        plt.annotate(f'{txt:.2f} µs', (x_indices[i], tiempos_bfs_us[i]),
+                     textcoords="offset points", xytext=(0, 9), ha='center',
+                     fontsize=9, fontweight='bold', color='#1e3a8a')
 
     plt.tight_layout()
     ruta_bfs = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tiempo_bfs.png')
     plt.savefig(ruta_bfs, dpi=300)
     plt.close()
-    print(f"  [+] Gráfica individual BFS guardada en: {ruta_bfs}")
+    print(f"  [+] Gráfica de línea BFS guardada en: {ruta_bfs}")
 
     # ─────────────────────────────────────────────────────────────────────────
-    # 2. Gráfica Individual DFS
+    # 2. Gráfica Individual de Línea - DFS
     # ─────────────────────────────────────────────────────────────────────────
-    plt.figure(figsize=(9, 5))
-    barras_dfs = plt.bar(etiquetas, tiempos_dfs_us, color='#dc2626', edgecolor='#b91c1c', width=0.55, alpha=0.9)
-    plt.title('Tiempo de Ejecución - DFS (Depth-First Search)', fontsize=13, fontweight='bold', pad=15)
-    plt.xlabel('Casos de Prueba (Pares de Usuarios)', fontsize=11, fontweight='bold')
-    plt.ylabel('Tiempo Promedio (Microsegundos - µs)', fontsize=11, fontweight='bold')
-    plt.grid(axis='y', linestyle='--', alpha=0.6)
-    
-    # Anotar valores en las barras
-    for bar in barras_dfs:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2.0, yval + (max(tiempos_dfs_us)*0.02), f'{yval:.1f} µs',
-                 ha='center', va='bottom', fontsize=9, fontweight='bold', color='#7f1d1d')
+    plt.figure(figsize=(8.5, 4.8))
+    plt.plot(x_indices, tiempos_dfs_us, color='#dc2626', linewidth=2.8,
+             marker='s', markersize=8, markerfacecolor='#b91c1c', markeredgecolor='white', markeredgewidth=1.8,
+             label='DFS (Pila LIFO)')
+    plt.fill_between(x_indices, tiempos_dfs_us, color='#ef4444', alpha=0.15)
+    plt.title('Perfil Temporal - DFS (Depth-First Search)', fontsize=12, fontweight='bold', pad=12)
+    plt.xlabel('Casos de Prueba (Pares de Usuarios)', fontsize=10, fontweight='bold')
+    plt.ylabel('Tiempo Promedio (µs)', fontsize=10, fontweight='bold')
+    plt.xticks(x_indices, etiquetas, fontsize=9)
+    plt.ylim(0, max(tiempos_dfs_us) * 1.25)
+    plt.grid(True, linestyle='--', alpha=0.5)
+
+    for i, txt in enumerate(tiempos_dfs_us):
+        plt.annotate(f'{txt:.2f} µs', (x_indices[i], tiempos_dfs_us[i]),
+                     textcoords="offset points", xytext=(0, 9), ha='center',
+                     fontsize=9, fontweight='bold', color='#7f1d1d')
 
     plt.tight_layout()
     ruta_dfs = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tiempo_dfs.png')
     plt.savefig(ruta_dfs, dpi=300)
     plt.close()
-    print(f"  [+] Gráfica individual DFS guardada en: {ruta_dfs}")
+    print(f"  [+] Gráfica de línea DFS guardada en: {ruta_dfs}")
 
     # ─────────────────────────────────────────────────────────────────────────
-    # 3. Gráfica Comparativa Unificada (BFS vs DFS)
+    # 3. Gráfica Comparativa Unificada de Líneas - BFS vs DFS
     # ─────────────────────────────────────────────────────────────────────────
-    x = range(len(etiquetas))
-    ancho = 0.35
+    plt.figure(figsize=(10.5, 5.2))
+    plt.plot(x_indices, tiempos_bfs_us, color='#2563eb', linewidth=2.6,
+             marker='o', markersize=8, markerfacecolor='#1d4ed8', markeredgecolor='white', markeredgewidth=1.8,
+             label='BFS (Cola FIFO - Monótono)')
+    plt.plot(x_indices, tiempos_dfs_us, color='#dc2626', linewidth=2.6,
+             marker='s', markersize=8, markerfacecolor='#b91c1c', markeredgecolor='white', markeredgewidth=1.8,
+             label='DFS (Pila LIFO - Variable)')
 
-    plt.figure(figsize=(11, 6))
-    rects1 = plt.bar([i - ancho/2 for i in x], tiempos_bfs_us, ancho, label='BFS (Cola FIFO)',
-                     color='#2563eb', edgecolor='#1d4ed8', alpha=0.9)
-    rects2 = plt.bar([i + ancho/2 for i in x], tiempos_dfs_us, ancho, label='DFS (Pila LIFO)',
-                     color='#dc2626', edgecolor='#b91c1c', alpha=0.9)
+    plt.title('Comparativa Simultánea de Tiempos de Ejecución: BFS vs. DFS', fontsize=13, fontweight='bold', pad=14)
+    plt.xlabel('Casos de Prueba (Pares de Usuarios)', fontsize=10, fontweight='bold')
+    plt.ylabel('Tiempo Promedio de CPU (µs)', fontsize=10, fontweight='bold')
+    plt.xticks(x_indices, etiquetas, fontsize=9)
+    y_max = max(max(tiempos_bfs_us), max(tiempos_dfs_us)) * 1.28
+    plt.ylim(0, y_max)
+    plt.grid(True, linestyle='--', alpha=0.55)
+    plt.legend(loc='upper right', frameon=True, facecolor='#f8fafc', edgecolor='#cbd5e1', fontsize=10)
 
-    plt.title('Comparativa Simultánea de Tiempo de Ejecución: BFS vs DFS', fontsize=14, fontweight='bold', pad=15)
-    plt.xlabel('Casos de Prueba (Pares de Usuarios)', fontsize=11, fontweight='bold')
-    plt.ylabel('Tiempo Promedio (Microsegundos - µs)', fontsize=11, fontweight='bold')
-    plt.xticks(x, etiquetas)
-    plt.legend(frameon=True, facecolor='#f8fafc', edgecolor='#cbd5e1', fontsize=11)
-    plt.grid(axis='y', linestyle='--', alpha=0.6)
-
-    # Etiquetas en barras
-    for bar in rects1:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2.0, yval + 0.3, f'{yval:.1f}',
-                 ha='center', va='bottom', fontsize=8, color='#1e3a8a')
-    for bar in rects2:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2.0, yval + 0.3, f'{yval:.1f}',
-                 ha='center', va='bottom', fontsize=8, color='#7f1d1d')
+    # Etiquetas de datos para ambas líneas
+    for i in range(len(x_indices)):
+        # BFS arriba
+        plt.annotate(f'{tiempos_bfs_us[i]:.2f}', (x_indices[i], tiempos_bfs_us[i]),
+                     textcoords="offset points", xytext=(-14, 8), fontsize=8.5, fontweight='bold', color='#1d4ed8')
+        # DFS abajo / arriba según cruce
+        y_offset = -14 if tiempos_dfs_us[i] < tiempos_bfs_us[i] else 8
+        plt.annotate(f'{tiempos_dfs_us[i]:.2f}', (x_indices[i], tiempos_dfs_us[i]),
+                     textcoords="offset points", xytext=(12, y_offset), fontsize=8.5, fontweight='bold', color='#b91c1c')
 
     plt.tight_layout()
     ruta_comparativa = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'comparativa_tiempos_bfs_vs_dfs.png')
     plt.savefig(ruta_comparativa, dpi=300)
     plt.close()
-    print(f"  [+] Gráfica unificada final guardada en: {ruta_comparativa}")
+    print(f"  [+] Gráfica comparativa de líneas guardada en: {ruta_comparativa}")
     print("=" * 86 + "\n")
-
-    return {
-        "etiquetas": etiquetas,
-        "tiempos_bfs": tiempos_bfs_us,
-        "tiempos_dfs": tiempos_dfs_us
-    }
 
 if __name__ == "__main__":
     benchmark_algoritmos()
